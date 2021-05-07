@@ -1,6 +1,10 @@
 import dayjs from 'dayjs';
 
 const MINUTES_IN_HOUR = 60;
+const RenderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+};
 
 const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
@@ -38,10 +42,31 @@ const getTotalDate = (dateFrom, dateTo) => {
   return `${dayjs(dateFrom).format('MMM D')} - ${dayjs(dateTo).format('D')}`;
 };
 
+const render = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+  }
+};
+
+const createElement = (template) => {
+  const newElement = document.createElement('div');
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+};
+
 export {
   getRandomInteger,
   getRandomIndex,
   getTimeDifference,
   formatDateForEditPoint,
-  getTotalDate
+  getTotalDate,
+  RenderPosition,
+  render,
+  createElement
 };
