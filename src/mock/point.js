@@ -8,9 +8,8 @@ const getRandomTypePoint = () => {
 };
 
 const getRandomDescription = (text) => {
-  //const sentence = text.replace(/([.?!])\s*(?=[A-Z])/g, '$1|');
   const sentence = text.slice(0, -1).split('. ');
-  const sentenceCount = getRandomInteger(Sentence.min, Sentence.max);
+  const sentenceCount = getRandomInteger(Sentence.MIN, Sentence.MAX);
   const randomIndex = getRandomIndex(sentence);
 
   return `${sentence.slice(randomIndex, randomIndex + sentenceCount).join('. ')}.`;
