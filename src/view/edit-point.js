@@ -1,5 +1,6 @@
 import {TYPES} from '../const.js';
-import {createElement, formatDateForEditPoint} from '../util.js';
+import {formatDateForEditPoint} from '../util/point.js';
+import AbstractView from './abstract.js';
 
 const BLANK_POINT = {
   type: '',
@@ -143,26 +144,36 @@ const createEditPointTemplate = (point) => {
   );
 };
 
-class EditPoint {
+class EditPoint extends AbstractView {
   constructor(point = BLANK_POINT) {
-    this._element = null;
+    super();
     this._point = point;
+
+    this._formCloseHandler = this._formCloseHandler.bind(this);
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
+  }
+
+  _formCloseHandler() {
+    this._callback.formClose();
+  }
+
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  }
+
+  setFormCloseHandler(callback) {
+    this._callback.formClose = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._formCloseHandler);
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
   }
 
   getTemplate() {
     return createEditPointTemplate(this._point);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

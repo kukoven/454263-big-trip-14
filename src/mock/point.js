@@ -1,5 +1,5 @@
 import {TYPES, TEST_TEXT, Sentence, CITIES, DAY_GAP, MINUTES_GAP, HOURS_GAP} from '../const.js';
-import {getRandomInteger, getRandomIndex} from '../util.js';
+import {getRandomInteger, getRandomIndex} from '../util/common.js';
 import {offers} from './offers.js';
 import dayjs from 'dayjs';
 

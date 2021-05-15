@@ -1,4 +1,5 @@
-import {createElement, getTimeDifference} from '../util.js';
+import {getTimeDifference} from '../util/point.js';
+import AbstractView from './abstract.js';
 import dayjs from 'dayjs';
 
 const createPointTemplate = (point) => {
@@ -64,26 +65,25 @@ const createPointTemplate = (point) => {
   );
 };
 
-class Point {
+class Point extends AbstractView {
   constructor(point) {
-    this._element = null;
+    super();
     this._point = point;
+
+    this._pointOpenHandler = this._pointOpenHandler.bind(this);
   }
 
   getTemplate() {
     return createPointTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _pointOpenHandler() {
+    this._callback.pointOpen();
   }
 
-  removeElement() {
-    this._element = null;
+  setPointOpenHandler(callback) {
+    this._callback.pointOpen = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._pointOpenHandler);
   }
 }
 
