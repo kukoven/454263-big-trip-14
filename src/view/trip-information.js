@@ -1,5 +1,5 @@
-import {createElement, getTotalDate} from '../util.js';
-
+import {getTotalDate} from '../util/point.js';
+import AbstractView from './abstract.js';
 const POINTS_COUNT = 3;
 
 const getTotalRoute = (points) => {
@@ -33,26 +33,14 @@ const createTripInformationTemplate = (points) => {
   );
 };
 
-class TripInformation {
+class TripInformation extends AbstractView {
   constructor(points) {
-    this._element = null;
+    super();
     this._points = points;
   }
 
   getTemplate() {
     return createTripInformationTemplate(this._points);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 
