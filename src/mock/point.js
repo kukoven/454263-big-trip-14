@@ -2,6 +2,7 @@ import {TYPES, TEST_TEXT, Sentence, CITIES, DAY_GAP, MINUTES_GAP, HOURS_GAP} fro
 import {getRandomInteger, getRandomIndex} from '../util/common.js';
 import {offers} from './offers.js';
 import dayjs from 'dayjs';
+import {nanoid} from 'nanoid';
 
 const getRandomTypePoint = () => {
   return TYPES[getRandomIndex(TYPES)];
@@ -52,6 +53,7 @@ const generatePoint = () => {
   }).offers;
 
   return {
+    id: nanoid(),
     type: randomTypePoint,
     destination: generateDestination(),
     dateFrom,
