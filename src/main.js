@@ -31,7 +31,3 @@ const tripPresenter = new TripPresenter(tripEvents);
 
 tripPresenter.init(points);
 
-points.forEach((currentValue) => {
-  console.log(currentValue.offers);
-  console.log(currentValue.offers.length);
-});
