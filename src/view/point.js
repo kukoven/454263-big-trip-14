@@ -5,9 +5,9 @@ import dayjs from 'dayjs';
 const createPointTemplate = (point) => {
   const {type, destination, dateFrom, dateTo, isFavorite, basePrice} = point;
   const date = dayjs(dateFrom).format('MMM D');
-  const timeFrom = dayjs(dateFrom);
-  const timeTo = dayjs(dateTo);
-  const timeDifference = getTimeDifference(timeFrom, timeTo);
+  const timeFrom = dayjs(dateFrom).format('HH:mm');
+  const timeTo = dayjs(dateTo).format('HH:mm');
+  const timeDifference = getTimeDifference(dateFrom, dateTo);
   const typeLowerCase = type.toLowerCase();
   const favoriteClassName = isFavorite
     ? 'event__favorite-btn event__favorite-btn--active'
@@ -38,9 +38,9 @@ const createPointTemplate = (point) => {
         <h3 class="event__title">${type} ${destination.name}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="2019-03-18T10:30">${timeFrom.format('HH:mm')}</time>
+            <time class="event__start-time" datetime="2019-03-18T10:30">${timeFrom}</time>
             &mdash;
-            <time class="event__end-time" datetime="2019-03-18T11:00">${timeTo.format('HH:mm')}</time>
+            <time class="event__end-time" datetime="2019-03-18T11:00">${timeTo}</time>
           </p>
           <p class="event__duration">${timeDifference}</p>
         </div>

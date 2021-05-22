@@ -9,6 +9,14 @@ const DAY_GAP = 3;
 const HOURS_GAP = 24;
 const MINUTES_GAP = 60;
 
+const SortType = {
+  DAY: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFERS: 'offers',
+};
+
 export {
   TYPES,
   TEST_TEXT,
@@ -16,5 +24,6 @@ export {
   CITIES,
   DAY_GAP,
   HOURS_GAP,
-  MINUTES_GAP
+  MINUTES_GAP,
+  SortType
 };
