@@ -15,11 +15,7 @@ const filtersContainer = pageHeader.querySelector('.trip-controls__filters');
 const pageMain = document.querySelector('.page-main');
 const tripEvents = pageMain.querySelector('.trip-events');
 
-const points = new Array(POINTS_COUNT).fill().map(generatePoint).sort((a, b) => {
-  if (a.dateTo > b.dateTo) {return 1;}
-  if (a.dateTo < b.dateTo) {return -1;}
-  return 0;
-});
+const points = new Array(POINTS_COUNT).fill().map(generatePoint);
 
 render(menuContainer, new SiteMenuView(), RenderPosition.BEFOREEND);
 render(filtersContainer, new FiltersView(), RenderPosition.BEFOREEND);
@@ -34,3 +30,4 @@ if (points.length > 0) {
 const tripPresenter = new TripPresenter(tripEvents);
 
 tripPresenter.init(points);
+
