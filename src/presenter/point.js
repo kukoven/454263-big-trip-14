@@ -82,6 +82,7 @@ class Point {
   _escDownHandler(evt) {
     if (isEscEvent(evt)) {
       evt.preventDefault();
+      this._editPointComponent.reset(this._point);
       this._replaceEditFormToPoint();
     }
   }
@@ -96,6 +97,7 @@ class Point {
   }
 
   _handleFormClose() {
+    this._editPointComponent.reset(this._point);
     this._replaceEditFormToPoint();
   }
 

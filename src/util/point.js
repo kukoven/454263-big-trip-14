@@ -53,18 +53,6 @@ const sortDay = (firstPoint, secondPoint) => {
   return dayjs(firstPoint.dateFrom).diff(dayjs(secondPoint.dateFrom));
 };
 
-const sortEvent = (firstPoint, secondPoint) => {
-  if (firstPoint.type > secondPoint.type) {
-    return 1;
-  }
-
-  if (firstPoint.type < secondPoint.type) {
-    return -1;
-  }
-
-  return 0;
-};
-
 const sortTime = (firstPoint, secondPoint) => {
   if ((dayjs(firstPoint.dateTo).diff(dayjs(firstPoint.dateFrom))) < (dayjs(secondPoint.dateTo).diff(dayjs(secondPoint.dateFrom)))) {
     return 1;
@@ -89,16 +77,8 @@ const sortPrice = (firstPoint, secondPoint) => {
   return 0;
 };
 
-const sortOffers = (firstPoint, secondPoint) => {
-  if (firstPoint.offers.length < secondPoint.offers.length) {
-    return 1;
-  }
-
-  if (firstPoint.offers.length > secondPoint.offers.length) {
-    return -1;
-  }
-
-  return 0;
+const findOffersType = (offers, type) => {
+  return offers.find((currentValue) => currentValue.type.toLowerCase() === type.toLowerCase()).offers;
 };
 
 export {
@@ -107,8 +87,7 @@ export {
   getTotalDate,
   getWeightNullDate,
   sortDay,
-  sortEvent,
   sortTime,
   sortPrice,
-  sortOffers
+  findOffersType
 };
