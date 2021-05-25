@@ -11,10 +11,8 @@ const MINUTES_GAP = 60;
 
 const SortType = {
   DAY: 'day',
-  EVENT: 'event',
   TIME: 'time',
   PRICE: 'price',
-  OFFERS: 'offers',
 };
 
 export {

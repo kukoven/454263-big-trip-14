@@ -3,6 +3,7 @@ import {getRandomInteger, getRandomIndex} from '../util/common.js';
 import {offers} from './offers.js';
 import dayjs from 'dayjs';
 import {nanoid} from 'nanoid';
+import {findOffersType} from '../util/point.js';
 
 const getRandomTypePoint = () => {
   return TYPES[getRandomIndex(TYPES)];
@@ -48,9 +49,7 @@ const generatePoint = () => {
   const dateTo = dayjs(dateFrom).add(getRandomInteger(0, getRandomInteger(0, HOURS_GAP)), 'hour').add(getRandomInteger(0, MINUTES_GAP), 'minute').format('YYYY-MM-DDTHH:mm');
   const randomTypePoint = getRandomTypePoint();
 
-  const typeOffers = offers.find((currentValue) => {
-    return currentValue.type === randomTypePoint;
-  }).offers;
+  const typeOffers = findOffersType(offers, randomTypePoint);
 
   return {
     id: nanoid(),
@@ -60,8 +59,10 @@ const generatePoint = () => {
     dateTo,
     isFavorite: Boolean(getRandomInteger(0, 1)),
     basePrice: getRandomInteger(1, 1000),
-    offers: typeOffers,
+    offers: typeOffers.map((item) => {
+      return {...item, isChecked: Boolean(getRandomInteger(0, 1))};
+    }),
   };
 };
 
-export {generatePoint};
+export {generatePoint, getRandomDescription, generatePictures};
