@@ -1,8 +1,11 @@
+import dayjs from 'dayjs';
 import {CITIES, TEST_TEXT, TYPES} from '../const.js';
 import {findOffersType, formatDateForEditPoint} from '../util/point.js';
 import SmartView from './smart.js';
 import {offers} from '../mock/offers.js';
 import {generatePictures, getRandomDescription} from '../mock/point.js';
+import flatpickr from 'flatpickr';
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const BLANK_POINT = {
   type: '',
@@ -158,25 +161,84 @@ class EditPoint extends SmartView {
     super();
     this._data = EditPoint.parsePointToData(point);
 
+    this._datepickerFrom = null;
+    this._datepickerTo = null;
+
     this._formCloseHandler = this._formCloseHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._pointTypeToggleHandler = this._pointTypeToggleHandler.bind(this);
     this._pointCityToggleHandler = this._pointCityToggleHandler.bind(this);
     this._pointOffersToggleHandler = this._pointOffersToggleHandler.bind(this);
+    this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
+    this._dateToChangeHandler = this._dateToChangeHandler.bind(this);
 
     this._setInnerHandlers();
+    this._setFromDatepicker();
+    this._setToDatepicker();
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setFormCloseHandler(this._callback.formClose);
+
+    this._setFromDatepicker();
+    this._setToDatepicker();
   }
 
   reset(point) {
     this.updateData(
       EditPoint.parsePointToData(point),
     );
+  }
+
+  _setFromDatepicker() {
+    if (this._datepickerFrom) {
+      this._datepickerFrom.destroy();
+      this._datepickerFrom = null;
+    }
+
+    this._datepickerFrom = flatpickr(
+      this.getElement().querySelector('#event-start-time-1'),
+      {
+        enableTime: true,
+        time_24hr: true,
+        dateFormat: 'd/m/y H:i',
+        defaultDate: dayjs(this._data.dateFrom).toDate(),
+        onChange: this._dateFromChangeHandler,
+      },
+    );
+  }
+
+  _setToDatepicker() {
+    if (this._datepickerTo) {
+      this._datepickerTo.destroy();
+      this._datepickerTo = null;
+    }
+
+    this._datepickerTo = flatpickr(
+      this.getElement().querySelector('#event-end-time-1'),
+      {
+        enableTime: true,
+        time_24hr: true,
+        minDate: dayjs(this._data.dateFrom).toDate(),
+        dateFormat: 'd/m/y H:i',
+        defaultDate: dayjs(this._data.dateTo).toDate(),
+        onChange: this._dateToChangeHandler,
+      },
+    );
+  }
+
+  _dateFromChangeHandler([userDate]) {
+    this.updateData({
+      dateFrom: userDate,
+    });
+  }
+
+  _dateToChangeHandler([userDate]) {
+    this.updateData({
+      dateTo: userDate,
+    });
   }
 
   _formCloseHandler() {
