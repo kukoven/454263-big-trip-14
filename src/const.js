@@ -118,5 +118,5 @@ export {
   DEFAULT_TIME_DIFFERENCE,
   UserAction,
   UpdateType,
-  FilterType,
+  FilterType
 };
