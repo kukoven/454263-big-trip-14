@@ -1,6 +1,8 @@
 import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import duration from 'dayjs/plugin/duration';
 dayjs.extend(isSameOrAfter);
+dayjs.extend(duration);
 
 const MINUTES_IN_HOUR = 60;
 
@@ -16,6 +18,19 @@ const getTimeDifference = (timeFrom, timeTo) => {
 
   return `${hours}H ${minutes}M`;
 };
+
+function getTimeDifferenceMs(start, end) {
+  return dayjs(end).diff(dayjs(start));
+}
+
+function getTimeFormatted(timeInMs) {
+  const time = {
+    hours: dayjs.duration(timeInMs).hours() > 0 ? dayjs.duration(timeInMs).hours() + 'H ' : '',
+    minutes: dayjs.duration(timeInMs).minutes() > 0 ? dayjs.duration(timeInMs).minutes() + 'M' : '',
+  };
+
+  return time.hours + time.minutes;
+}
 
 const formatDateForEditPoint = (date) => {
   if (date !== null) {
@@ -83,13 +98,14 @@ const findOffersType = (offers, type) => {
   return offers.find((currentValue) => currentValue.type.toLowerCase() === type.toLowerCase()).offers;
 };
 
-function isPointFuture(date) {
+const isPointFuture = (date) => {
   return dayjs(date).isSameOrAfter(dayjs());
-}
+};
 
-function isPointPast(date) {
+const isPointPast = (date) => {
   return dayjs(date).isBefore(dayjs());
-}
+};
+
 
 export {
   getTimeDifference,
@@ -101,5 +117,7 @@ export {
   sortPrice,
   findOffersType,
   isPointFuture,
-  isPointPast
+  isPointPast,
+  getTimeFormatted,
+  getTimeDifferenceMs
 };

@@ -105,6 +105,11 @@ const FilterType = {
   PAST: 'past',
 };
 
+const MenuItem = {
+  TABLE: 'Table',
+  STATS: 'Stats',
+};
+
 export {
   TYPES,
   TEST_TEXT,
@@ -118,5 +123,6 @@ export {
   DEFAULT_TIME_DIFFERENCE,
   UserAction,
   UpdateType,
-  FilterType
+  FilterType,
+  MenuItem
 };
