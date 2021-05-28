@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+dayjs.extend(isSameOrAfter);
 
 const MINUTES_IN_HOUR = 60;
 
@@ -24,7 +26,7 @@ const formatDateForEditPoint = (date) => {
 };
 
 const getTotalDate = (dateFrom, dateTo) => {
-  return `${dayjs(dateFrom).format('MMM D')} - ${dayjs(dateTo).format('D')}`;
+  return `${dayjs(dateFrom).format('MMM D')} - ${dayjs(dateTo).format('MMM D')}`;
 };
 
 const getWeightNullDate = (firstDate, secondDate) => {
@@ -81,6 +83,14 @@ const findOffersType = (offers, type) => {
   return offers.find((currentValue) => currentValue.type.toLowerCase() === type.toLowerCase()).offers;
 };
 
+function isPointFuture(date) {
+  return dayjs(date).isSameOrAfter(dayjs());
+}
+
+function isPointPast(date) {
+  return dayjs(date).isBefore(dayjs());
+}
+
 export {
   getTimeDifference,
   formatDateForEditPoint,
@@ -89,5 +99,7 @@ export {
   sortDay,
   sortTime,
   sortPrice,
-  findOffersType
+  findOffersType,
+  isPointFuture,
+  isPointPast
 };
