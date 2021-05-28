@@ -2,6 +2,7 @@ import PointView from '../view/point.js';
 import EditPointView from '../view/edit-point.js';
 import {render, remove, replace, RenderPosition} from '../util/render.js';
 import {isEscEvent} from '../util/common.js';
+import {UserAction, UpdateType} from '../const.js';
 
 const Mode = {
   EDITING: 'EDITING',
@@ -23,6 +24,8 @@ class Point {
     this._handleFormClose = this._handleFormClose.bind(this);
     this._escDownHandler = this._escDownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
   init(point) {
@@ -35,9 +38,11 @@ class Point {
     this._editPointComponent = new EditPointView(point);
 
     this._pointComponent.setPointOpenHandler(this._handleEditClick);
+    this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+
     this._editPointComponent.setFormCloseHandler(this._handleFormClose);
     this._editPointComponent.setFormSubmitHandler(this._handleFormSubmit);
-    this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._editPointComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     if (prevEditPointComponent === null || prevPointComponent === null) {
       render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
@@ -92,7 +97,12 @@ class Point {
   }
 
   _handleFormSubmit(point) {
-    this._changeData(point);
+    this._changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
+
     this._replaceEditFormToPoint();
   }
 
@@ -103,6 +113,8 @@ class Point {
 
   _handleFavoriteClick() {
     this._changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
       Object.assign(
         {},
         this._point,
@@ -110,6 +122,14 @@ class Point {
           isFavorite: !this._point.isFavorite,
         },
       ),
+    );
+  }
+
+  _handleDeleteClick(point) {
+    this._changeData(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,
     );
   }
 }

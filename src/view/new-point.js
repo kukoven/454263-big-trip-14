@@ -3,21 +3,24 @@ import he from 'he';
 import {CITIES, TEST_TEXT, TYPES, OFFERS, DEFAULT_TIME_DIFFERENCE} from '../const.js';
 import {findOffersType, formatDateForEditPoint} from '../util/point.js';
 import SmartView from './smart.js';
-import {generatePictures, getRandomDescription} from '../mock/point.js';
+import {generatePictures, getRandomDescription, generateDestination} from '../mock/point.js';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
+const typeBlank = TYPES[0];
+
 const BLANK_POINT = {
-  type: '',
-  destination: '',
-  dateFrom: '',
-  dateTo: '',
-  basePrice: '',
+  type: typeBlank,
+  destination: generateDestination(),
+  dateFrom: dayjs().format('YYYY-MM-DD  HH:mm'),
+  dateTo: dayjs().format('YYYY-MM-DD  HH:mm'),
+  basePrice: 0,
+  isFavorite: false,
   description: '',
-  offers: [],
+  offers: findOffersType(OFFERS, typeBlank),
 };
 
-const createEditPointTemplate = (point) => {
+const createNewPointTemplate = (point) => {
   const {
     type,
     destination,
@@ -130,10 +133,7 @@ const createEditPointTemplate = (point) => {
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
-          <button class="event__rollup-btn" type="button">
-            <span class="visually-hidden">Open event</span>
-          </button>
+          <button class="event__reset-btn" type="reset">Cancel</button>
         </header>
         <section class="event__details">
 
@@ -144,7 +144,7 @@ const createEditPointTemplate = (point) => {
             <p class="event__destination-description">${destination.description}</p>
             <div class="event__photos-container">
               <div class="event__photos-tape">
-                ${point.destination.pictures.map((item) => `
+                ${destination.pictures.map((item) => `
                   <img class="event__photo" src="${item.src}" alt="${item.destination}">
                 `).join('')}
               </div>
@@ -156,33 +156,41 @@ const createEditPointTemplate = (point) => {
   );
 };
 
-class EditPoint extends SmartView {
+class NewPoint extends SmartView {
   constructor(point = BLANK_POINT) {
     super();
-    this._data = EditPoint.parsePointToData(point);
+    this._data = NewPoint.parsePointToData(point);
 
     this._datepickerFrom = null;
     this._datepickerTo = null;
 
-    this._formCloseHandler = this._formCloseHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._pointTypeToggleHandler = this._pointTypeToggleHandler.bind(this);
     this._pointCityToggleHandler = this._pointCityToggleHandler.bind(this);
     this._pointOffersToggleHandler = this._pointOffersToggleHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
+    this._basicPriceChangeHandler = this._basicPriceChangeHandler.bind(this);
+
     this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
     this._dateToChangeHandler = this._dateToChangeHandler.bind(this);
-    this._deletePointClickHandler = this._deletePointClickHandler.bind(this);
-    this._basicPriceChangeHandler = this._basicPriceChangeHandler.bind(this);
 
     this._setInnerHandlers();
     this._setFromDatepicker();
     this._setToDatepicker();
   }
 
+  removeElement() {
+    super.removeElement();
+
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
+  }
+
   restoreHandlers() {
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setFormCloseHandler(this._callback.formClose);
     this.setDeleteClickHandler(this._callback.deleteClick);
 
     this._setFromDatepicker();
@@ -191,7 +199,7 @@ class EditPoint extends SmartView {
 
   reset(point) {
     this.updateData(
-      EditPoint.parsePointToData(point),
+      NewPoint.parsePointToData(point),
     );
   }
 
@@ -249,10 +257,6 @@ class EditPoint extends SmartView {
     });
   }
 
-  _formCloseHandler() {
-    this._callback.formClose();
-  }
-
   _formSubmitHandler(evt) {
     evt.preventDefault();
 
@@ -263,7 +267,12 @@ class EditPoint extends SmartView {
       return;
     }
 
-    this._callback.formSubmit(EditPoint.parseDataToPoint(this._data));
+    this._callback.formSubmit(NewPoint.parseDataToPoint(this._data));
+  }
+
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick();
   }
 
   _setInnerHandlers() {
@@ -275,20 +284,15 @@ class EditPoint extends SmartView {
       .querySelector('.event__input--destination')
       .addEventListener('change', this._pointCityToggleHandler);
 
+    this.getElement()
+      .querySelector('#event-price-1')
+      .addEventListener('change', this._basicPriceChangeHandler);
+
     if (this.getElement().querySelector('.event__available-offers') !== null) {
       this.getElement()
         .querySelector('.event__available-offers')
         .addEventListener('change', this._pointOffersToggleHandler);
     }
-
-    this.getElement()
-      .querySelector('#event-price-1')
-      .addEventListener('change', this._basicPriceChangeHandler);
-  }
-
-  setFormCloseHandler(callback) {
-    this._callback.formClose = callback;
-    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._formCloseHandler);
   }
 
   setFormSubmitHandler(callback) {
@@ -296,27 +300,13 @@ class EditPoint extends SmartView {
     this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
   }
 
-  _basicPriceChangeHandler(evt) {
-    const newPrice = parseInt(evt.currentTarget.value);
-
-    const justDataUpdating = true;
-
-    this.updateData({
-      basePrice: newPrice,
-    }, justDataUpdating);
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
   }
 
   getTemplate() {
-    return createEditPointTemplate(this._data);
-  }
-
-  removeElement() {
-    super.removeElement();
-
-    if (this._datepicker) {
-      this._datepicker.destroy();
-      this._datepicker = null;
-    }
+    return createNewPointTemplate(this._data);
   }
 
   _pointTypeToggleHandler(evt) {
@@ -360,14 +350,14 @@ class EditPoint extends SmartView {
     });
   }
 
-  _deletePointClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.deleteClick(EditPoint.parseDataToPoint(this._data));
-  }
+  _basicPriceChangeHandler(evt) {
+    const newPrice = parseInt(evt.currentTarget.value);
 
-  setDeleteClickHandler(callback) {
-    this._callback.deleteClick = callback;
-    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._deletePointClickHandler);
+    const justDataUpdating = true;
+
+    this.updateData({
+      basePrice: newPrice,
+    }, justDataUpdating);
   }
 
   static parsePointToData(point) {
@@ -379,4 +369,4 @@ class EditPoint extends SmartView {
   }
 }
 
-export default EditPoint;
+export default NewPoint;

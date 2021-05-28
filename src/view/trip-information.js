@@ -23,13 +23,11 @@ const createTripInformationTemplate = (points) => {
   const totalRoute = getTotalRoute(points);
 
   return (
-    `<section class="trip-main__trip-info  trip-info">
-      <div class="trip-info__main">
-        <h1 class="trip-info__title">${totalRoute}</h1>
+    `<div class="trip-info__main">
+      <h1 class="trip-info__title">${totalRoute}</h1>
 
-        <p class="trip-info__dates">${totalDate}</p>
-      </div>
-    </section>`
+      <p class="trip-info__dates">${totalDate}</p>
+    </div>`
   );
 };
 

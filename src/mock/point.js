@@ -1,6 +1,5 @@
-import {TYPES, TEST_TEXT, Sentence, CITIES, DAY_GAP, MINUTES_GAP, HOURS_GAP} from '../const.js';
+import {TYPES, TEST_TEXT, Sentence, CITIES, DAY_GAP, MINUTES_GAP, HOURS_GAP, OFFERS} from '../const.js';
 import {getRandomInteger, getRandomIndex} from '../util/common.js';
-import {offers} from './offers.js';
 import dayjs from 'dayjs';
 import {nanoid} from 'nanoid';
 import {findOffersType} from '../util/point.js';
@@ -49,7 +48,7 @@ const generatePoint = () => {
   const dateTo = dayjs(dateFrom).add(getRandomInteger(0, getRandomInteger(0, HOURS_GAP)), 'hour').add(getRandomInteger(0, MINUTES_GAP), 'minute').format('YYYY-MM-DDTHH:mm');
   const randomTypePoint = getRandomTypePoint();
 
-  const typeOffers = findOffersType(offers, randomTypePoint);
+  const typeOffers = findOffersType(OFFERS, randomTypePoint);
 
   return {
     id: nanoid(),
@@ -65,4 +64,4 @@ const generatePoint = () => {
   };
 };
 
-export {generatePoint, getRandomDescription, generatePictures};
+export {generatePoint, getRandomDescription, generatePictures, generateDestination};
