@@ -1,5 +1,3 @@
-const regularExpression = new RegExp('^\\d+$');
-
 const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
 
@@ -16,8 +14,4 @@ const isEscEvent = (evt) => {
 
 };
 
-const isNumber = (value) => {
-  return regularExpression.test(value);
-};
-
-export {getRandomInteger, getRandomIndex, isEscEvent, isNumber};
+export {getRandomInteger, getRandomIndex, isEscEvent};

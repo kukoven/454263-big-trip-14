@@ -4,10 +4,10 @@ import {RenderPosition, render, remove} from '../util/render.js';
 import {UserAction, UpdateType} from '../const.js';
 
 class NewPoint {
-  constructor(pointListContainer, changeData, changeMode) {
+  constructor(pointListContainer, changeData, newPointButton) {
     this._pointListContainer = pointListContainer;
     this._changeData = changeData;
-    this._changeMode = changeMode;
+    this._newPointButton = newPointButton;
 
     this._newPointComponent = null;
 
@@ -46,6 +46,7 @@ class NewPoint {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       this.destroy();
       document.removeEventListener('keydown', this._handleEscDown);
+      this._newPointButton.disabled = false;
     }
   }
 
@@ -56,10 +57,12 @@ class NewPoint {
       Object.assign({}, updatedPoint, {id: nanoid()}),
     );
 
+    this._newPointButton.disabled = false;
     this.destroy();
   }
 
   _handleDeleteClick() {
+    this._newPointButton.disabled = false;
     this.destroy();
   }
 }
