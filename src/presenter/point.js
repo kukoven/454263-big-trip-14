@@ -28,14 +28,15 @@ class Point {
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
-  init(point) {
+  init(point, offers, destinations) {
     this._point = point;
 
     const prevPointComponent = this._pointComponent;
     const prevEditPointComponent = this._editPointComponent;
 
     this._pointComponent = new PointView(point);
-    this._editPointComponent = new EditPointView(point);
+
+    this._editPointComponent = new EditPointView(point, offers, destinations);
 
     this._pointComponent.setPointOpenHandler(this._handleEditClick);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);

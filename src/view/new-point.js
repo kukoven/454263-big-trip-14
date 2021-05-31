@@ -1,86 +1,88 @@
 import dayjs from 'dayjs';
 import he from 'he';
-import {CITIES, TEST_TEXT, TYPES, OFFERS, DEFAULT_TIME_DIFFERENCE} from '../const.js';
-import {findOffersType, formatDateForEditPoint} from '../util/point.js';
+import {TYPES, DEFAULT_TIME_DIFFERENCE} from '../const.js';
+import {formatDateForEditPoint} from '../util/point.js';
 import SmartView from './smart.js';
-import {generatePictures, getRandomDescription, generateDestination} from '../mock/point.js';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
-const typeBlank = TYPES[0];
+const createDestinationDatalistTemplate = (destinations) => {
+  let optionsMarkup = '';
 
-const BLANK_POINT = {
-  type: typeBlank,
-  destination: generateDestination(),
-  dateFrom: dayjs().format('YYYY-MM-DD  HH:mm'),
-  dateTo: dayjs().format('YYYY-MM-DD  HH:mm'),
-  basePrice: 0,
-  isFavorite: false,
-  description: '',
-  offers: findOffersType(OFFERS, typeBlank),
+  destinations.forEach((destination) => {
+    optionsMarkup += `<option value="${destination.name}"></option>`;
+  });
+
+  return optionsMarkup;
 };
 
-const createNewPointTemplate = (point) => {
+const createOptionOffersTemplate = (allOffersOfCurrentType, checkedOffers) => {
+  const allOffers = allOffersOfCurrentType.offers;
+
+  if (!allOffers.length) {
+    return '';
+  }
+  let optionsMarkup = '';
+  allOffers.forEach((offer, index) => {
+    const isChecked  = checkedOffers.find((checkedOffer) => {
+      return checkedOffer.title === offer.title;
+    });
+    const id = `event-offer-${offer.title.toLowerCase().split(' ').join('-')}-${index + 1}`;
+
+    optionsMarkup += `<div class="event__offer-selector">
+    <input class="event__offer-checkbox  visually-hidden" id="${id}" type="checkbox" value="${offer.title}" name="${id}" ${isChecked ? 'checked' : ''}>
+    <label class="event__offer-label" for="${id}">
+      <span class="event__offer-title">${offer.title}</span>
+      &plus;&euro;&nbsp;
+      <span class="event__offer-price">${offer.price}</span>
+    </label>
+  </div>`;
+  });
+
+  return `<section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+
+      <div class="event__available-offers">
+      ${optionsMarkup}
+      </div>
+    </section>`;
+};
+
+const createEventTypeItemsTemplate = (chosenType, types) => {
+  let itemsMarkup = '';
+
+  types.forEach((currentType) => {
+    itemsMarkup += `<div class="event__type-item">
+      <input id="event-type-${currentType.toLowerCase()}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${currentType.toLowerCase()}" ${currentType.toLowerCase() === chosenType ? 'checked' : ''}>
+      <label class="event__type-label  event__type-label--${currentType.toLowerCase()}" for="event-type-${currentType.toLowerCase()}">${currentType}</label>
+    </div>`;
+  });
+
+  return itemsMarkup;
+};
+
+const createPicturesTemplate = (pictures) => {
+  let picturesMarkup = '';
+  pictures.forEach((picture) => {
+    picturesMarkup += `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`;
+  });
+  return picturesMarkup;
+};
+
+const createNewPointTemplate = (point, offersData, destinationsData) => {
   const {
     type,
     destination,
     dateFrom,
     dateTo,
     basePrice,
-    offers,
   } = point;
 
-  const checkedType = type;
-
-  const renderTypeElements = () => {
-    return TYPES.map((currentValue) => `
-      <div class="event__type-item">
-        <input id="event-type-${currentValue.toLowerCase()}-1"
-               class="event__type-input  visually-hidden"
-               type="radio"
-               name="event-type"
-               value="${currentValue.toLowerCase()}"
-               ${currentValue === checkedType || currentValue.toLowerCase() === checkedType ? 'checked' : ''}>
-        <label class="event__type-label  event__type-label--${currentValue.toLowerCase()}"
-               for="event-type-${currentValue.toLowerCase()}-1">
-        ${currentValue}
-        </label>
-      </div>
-    `).join('');
-  };
-
-  const generateOffersElement = () => {
-    if (offers.length > 0) {
-      return `
-        <section class="event__section  event__section--offers">
-          <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-          <div class="event__available-offers">
-            ${offers.map((currentValue) => `
-            <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden"
-                     id="event-offer-luggage-${currentValue.price}"
-                     type="checkbox"
-                     name="event-offer-luggage"
-                     ${currentValue.isChecked ? 'checked' : ''}
-                     data-offer-title="${currentValue.title}">
-              <label class="event__offer-label" for="event-offer-luggage-${currentValue.price}">
-                <span class="event__offer-title">${currentValue.title}</span>
-                &plus;&euro;&nbsp;
-                <span class="event__offer-price">${currentValue.price}</span>
-              </label>
-            </div>`).join('')}
-          </div>
-        </section>`;
-    }
-
-    return '';
-  };
-
-  const cityDataList = CITIES.map((currentValue) => {
-    return `
-      <option value="${currentValue}"></option>
-    `;
-  }).join('');
+  const checkedOffers = point.offers;
+  const destinations = destinationsData;
+  const allOffersOfCurrentType = offersData.find((item) => {
+    return item.type === type;
+  });
 
   return (
     `<li class="trip-events__item">
@@ -89,28 +91,28 @@ const createNewPointTemplate = (point) => {
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${checkedType.toLowerCase()}.png" alt="Event type icon">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-                ${renderTypeElements()}
+                ${createEventTypeItemsTemplate(type, TYPES)}
               </fieldset>
             </div>
           </div>
 
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-1">
-              ${checkedType}
+              ${type}
             </label>
             <input class="event__input  event__input--destination"
                    id="event-destination-1"
                    type="text" name="event-destination"
                    value="${he.encode(destination.name)}" list="destination-list-1">
             <datalist id="destination-list-1">
-                ${cityDataList}
+                ${createDestinationDatalistTemplate(destinations)}
             </datalist>
           </div>
 
@@ -137,16 +139,14 @@ const createNewPointTemplate = (point) => {
         </header>
         <section class="event__details">
 
-          ${generateOffersElement()}
+          ${createOptionOffersTemplate(allOffersOfCurrentType, checkedOffers)}
 
           <section class="event__section  event__section--destination">
             <h3 class="event__section-title  event__section-title--destination">Destination</h3>
             <p class="event__destination-description">${destination.description}</p>
             <div class="event__photos-container">
               <div class="event__photos-tape">
-                ${destination.pictures.map((item) => `
-                  <img class="event__photo" src="${item.src}" alt="${item.destination}">
-                `).join('')}
+                ${createPicturesTemplate(destination.pictures)}
               </div>
             </div>
           </section>
@@ -157,22 +157,26 @@ const createNewPointTemplate = (point) => {
 };
 
 class NewPoint extends SmartView {
-  constructor(point = BLANK_POINT) {
+  constructor(point, allOffers, allDestinations) {
     super();
-    this._data = NewPoint.parsePointToData(point);
+    this._data = NewPoint.createPointBlank(point, allDestinations);
 
     this._datepickerFrom = null;
     this._datepickerTo = null;
 
+    this._destinations = allDestinations;
+    this._offers = allOffers;
+
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._pointTypeToggleHandler = this._pointTypeToggleHandler.bind(this);
     this._pointCityToggleHandler = this._pointCityToggleHandler.bind(this);
-    this._pointOffersToggleHandler = this._pointOffersToggleHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
     this._basicPriceChangeHandler = this._basicPriceChangeHandler.bind(this);
 
     this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
     this._dateToChangeHandler = this._dateToChangeHandler.bind(this);
+
+    this._offersChangeHandler = this._offersChangeHandler.bind(this);
 
     this._setInnerHandlers();
     this._setFromDatepicker();
@@ -262,7 +266,7 @@ class NewPoint extends SmartView {
 
     const newCityName = this.getElement().querySelector('#event-destination-1');
 
-    if (CITIES.indexOf(newCityName.value) === -1) {
+    if (this._getDestinationList(this._destinations).indexOf(newCityName.value) === -1) {
       newCityName.value = '';
       return;
     }
@@ -288,10 +292,38 @@ class NewPoint extends SmartView {
       .querySelector('#event-price-1')
       .addEventListener('change', this._basicPriceChangeHandler);
 
-    if (this.getElement().querySelector('.event__available-offers') !== null) {
-      this.getElement()
-        .querySelector('.event__available-offers')
-        .addEventListener('change', this._pointOffersToggleHandler);
+    const offersSectionElement = this.getElement().querySelector('.event__section--offers');
+
+    if (offersSectionElement) {
+      offersSectionElement.addEventListener('change', this._offersChangeHandler);
+    }
+  }
+
+  _offersChangeHandler(evt) {
+    if (!evt.target.classList.contains('event__offer-checkbox')) {
+      return;
+    }
+    const justDataUpdating = true;
+    const selectedOfferName = evt.target.value;
+
+    const selectedOfferIndex = this._data.offers.findIndex((offer) => {
+      return offer.title === selectedOfferName;
+    });
+
+    if (selectedOfferIndex < 0) {
+      const currentOffer = this._offers.find((offers) => {
+        return offers.type === this._data.type;
+      }).offers.find((offer) => {
+        return offer.title === selectedOfferName;
+      });
+
+      this.updateData({
+        offers: [currentOffer, ...this._data.offers],
+      }, justDataUpdating);
+    } else {
+      this.updateData({
+        offers: [...this._data.offers.slice(0, selectedOfferIndex), ...this._data.offers.slice(selectedOfferIndex + 1)],
+      }, justDataUpdating);
     }
   }
 
@@ -306,15 +338,20 @@ class NewPoint extends SmartView {
   }
 
   getTemplate() {
-    return createNewPointTemplate(this._data);
+    return createNewPointTemplate(this._data, this._offers, this._destinations);
   }
 
   _pointTypeToggleHandler(evt) {
     evt.preventDefault();
     this.updateData({
       type: evt.target.value,
-      offers: findOffersType(OFFERS, evt.target.value),
+      offers: [],
     });
+  }
+
+  _getDestinationList(destinations) {
+    const destinationList = destinations.map((destination) => destination.name);
+    return destinationList;
   }
 
   _pointCityToggleHandler(evt) {
@@ -322,34 +359,20 @@ class NewPoint extends SmartView {
 
     if (newCityName === this._data.destination) {
       return;
-    }
-
-    if (CITIES.indexOf(newCityName) === -1) {
+    } else if (this._getDestinationList(this._destinations).indexOf(newCityName) === -1) {
       evt.currentTarget.value = '';
       return;
     }
 
-    if (CITIES.includes(evt.target.value)) {
+    const destinationItem = this._destinations.find((destination) => {
+      return destination.name === newCityName;
+    });
+
+    if (destinationItem) {
       this.updateData({
-        destination: {
-          description: getRandomDescription(TEST_TEXT),
-          name: evt.target.value,
-          pictures: generatePictures(),
-        },
+        destination: destinationItem,
       });
     }
-  }
-
-  _pointOffersToggleHandler(evt) {
-    this.updateData({
-      offers: this._data.offers.map((currentValue) => {
-        if (currentValue.title === evt.target.dataset.offerTitle) {
-          currentValue.isChecked = !currentValue.isChecked;
-        }
-
-        return currentValue;
-      }),
-    });
   }
 
   _basicPriceChangeHandler(evt) {
@@ -368,6 +391,25 @@ class NewPoint extends SmartView {
 
   static parseDataToPoint(data) {
     return Object.assign({}, data);
+  }
+
+  static createPointBlank(point, destinations) {
+    if (point) {
+      return NewPoint.parsePointToData(point);
+    }
+
+    const pointBlank = {
+      type: TYPES[0].toLowerCase(),
+      destination: destinations[0],
+      dateFrom: dayjs().toDate(),
+      dateTo: dayjs().toDate(),
+      basePrice: 0,
+      isFavorite: false,
+      description: '',
+      offers: [],
+    };
+
+    return NewPoint.parsePointToData(pointBlank);
   }
 }
 

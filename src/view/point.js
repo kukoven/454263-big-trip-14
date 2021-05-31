@@ -2,31 +2,31 @@ import {getTimeDifference} from '../util/point.js';
 import AbstractView from './abstract.js';
 import dayjs from 'dayjs';
 
+const createOptionsTemplate = (options) => {
+  let optionsMarkup ='';
+  options.forEach((option) => {
+    optionsMarkup += `<li class="event__offer">
+      <span class="event__offer-title">${option.title}</span>
+      &plus;&euro;&nbsp;
+      <span class="event__offer-price">${option.price}</span>
+    </li>`;
+  });
+
+  return optionsMarkup;
+};
+
 const createPointTemplate = (point) => {
-  const {type, destination, dateFrom, dateTo, isFavorite, basePrice} = point;
+  const {type, destination, dateFrom, dateTo, isFavorite, basePrice, offers} = point;
   const date = dayjs(dateFrom).format('MMM D');
   const timeFrom = dayjs(dateFrom).format('HH:mm');
   const timeTo = dayjs(dateTo).format('HH:mm');
   const timeDifference = getTimeDifference(dateFrom, dateTo);
   const typeLowerCase = type.toLowerCase();
+  const optionsMarkup = createOptionsTemplate(offers);
+
   const favoriteClassName = isFavorite
     ? 'event__favorite-btn event__favorite-btn--active'
     : 'event__favorite-btn';
-
-  const generateOffersElement = () => {
-    return point.offers.map((currentValue) => {
-      if (currentValue.title === '') {
-        return '';
-      }
-
-      return `
-      <li class="event__offer">
-        <span class="event__offer-title">${currentValue.title}</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">${currentValue.price}</span>
-      </li>`;
-    }).join('');
-  };
 
   return (
     `<li class="trip-events__item">
@@ -49,7 +49,7 @@ const createPointTemplate = (point) => {
         </p>
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">
-          ${generateOffersElement()}
+          ${optionsMarkup}
         </ul>
         <button class="${favoriteClassName}" type="button">
           <span class="visually-hidden">Add to favorite</span>

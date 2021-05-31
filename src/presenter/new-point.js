@@ -10,6 +10,7 @@ class NewPoint {
     this._newPointButton = newPointButton;
 
     this._newPointComponent = null;
+    this._checkPointsCountCallback = null;
 
     this._handleEscDown = this._handleEscDown.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
@@ -17,12 +18,14 @@ class NewPoint {
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
-  init() {
+  init(callback, offers, destinations) {
+    this._checkPointsCountCallback = callback;
+
     if (this._newPointComponent !== null) {
       return;
     }
 
-    this._newPointComponent = new NewPointView();
+    this._newPointComponent = new NewPointView(undefined, offers, destinations);
 
     this._newPointComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._newPointComponent.setDeleteClickHandler(this._handleDeleteClick);
@@ -44,6 +47,7 @@ class NewPoint {
 
   _handleEscDown(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
+      this._checkPointsCountCallback();
       this.destroy();
       document.removeEventListener('keydown', this._handleEscDown);
       this._newPointButton.disabled = false;
@@ -62,6 +66,7 @@ class NewPoint {
   }
 
   _handleDeleteClick() {
+    this._checkPointsCountCallback();
     this._newPointButton.disabled = false;
     this.destroy();
   }
