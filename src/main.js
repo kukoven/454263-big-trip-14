@@ -8,7 +8,7 @@ import SiteMenuView from './view/site-menu.js';
 import StatisticsView from './view/statistics.js';
 import Api from './api.js';
 
-const AUTHORIZATION = 'Basic 11_mkr';
+const AUTHORIZATION = 'Basic 3mkr';
 const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
 
 const tripMainElement = document.querySelector('.trip-main');
