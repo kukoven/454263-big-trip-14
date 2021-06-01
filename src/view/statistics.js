@@ -7,7 +7,7 @@ import SmartView from './smart.js';
 const BAR_HEIGHT = 55;
 const MIN_TYPES_COUNT = 4;
 
-function createStatisticsTemplate(points) {
+const createStatisticsTemplate = (points) => {
   const typesCount = getTypes(points).length;
   let height = BAR_HEIGHT * MIN_TYPES_COUNT;
 
@@ -27,7 +27,7 @@ function createStatisticsTemplate(points) {
       <canvas class="statistics__chart  statistics__chart--time" width="900" height="${height}"></canvas>
     </div>
   </section>`;
-}
+};
 
 const getTypes = (points) => {
   const uniqueTypes = new Set();
@@ -87,7 +87,7 @@ const getCountOfTypes = (points) => {
   return {types: uniqueTypes, counts};
 };
 
-function getTimeOfTypes(points) {
+const getTimeOfTypes = (points) => {
   let uniqueTypes = getTypes(points);
 
   let times = uniqueTypes.map((type) => {
@@ -109,7 +109,7 @@ function getTimeOfTypes(points) {
   uniqueTypes = indexes.map((i) => uniqueTypes[i]);
 
   return {types: uniqueTypes, times};
-}
+};
 
 const createMoneyChart = (moneyCtx, points) => {
   const data = getSumPriceOfTypes(points);

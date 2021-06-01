@@ -1,4 +1,4 @@
-import {MenuItem, UpdateType} from './const.js';
+import {MenuItem, UpdateType, INIT_ERROR_MESSAGE} from './const.js';
 import {RenderPosition, render, remove} from './util/render.js';
 import PointsModel from './model/points.js';
 import TripPresenter from './presenter/trip.js';
@@ -8,7 +8,7 @@ import SiteMenuView from './view/site-menu.js';
 import StatisticsView from './view/statistics.js';
 import Api from './api.js';
 
-const AUTHORIZATION = 'Basic 3mkr';
+const AUTHORIZATION = 'Basic 4mkr';
 const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
 
 const tripMainElement = document.querySelector('.trip-main');
@@ -25,7 +25,6 @@ const pointsModel = new PointsModel();
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
-const filterPresenter = new FilterPresenter(filtersElement, filterModel);
 let tripPresenter = null;
 
 let statisticsComponent = null;
@@ -40,13 +39,13 @@ const handleSiteMenuClick = (menuItem) => {
 
   switch (menuItem) {
     case MenuItem.TABLE:
-      tripPresenter.showEventsTable();
+      tripPresenter.init();
       newPointButton.disabled = false;
 
       remove(statisticsComponent);
       break;
     case MenuItem.STATS:
-      tripPresenter.hideEventsTable();
+      tripPresenter.destroy();
       newPointButton.disabled = true;
 
       statisticsComponent = new StatisticsView(pointsModel.getPoints());
@@ -55,13 +54,15 @@ const handleSiteMenuClick = (menuItem) => {
   }
 };
 
-let destinations = api.getDestinations();
-let offers = api.getOffers();
-let points = api.getPoints();
+const filterPresenter = new FilterPresenter(filtersElement, filterModel, handleSiteMenuClick);
 
-Promise.all([destinations, offers, points])
+const destinationsRequest = api.getDestinations();
+const offersRequest = api.getOffers();
+const pointsRequest = api.getPoints();
+
+Promise.all([destinationsRequest, offersRequest, pointsRequest])
   .then((results) => {
-    [destinations, offers, points] = results;
+    const [destinations, offers, points] = results;
 
     tripPresenter = new TripPresenter(tripMainElement, pageMainElement, pointsModel, filterModel, offers, destinations, api);
     tripPresenter.init();
@@ -77,4 +78,6 @@ Promise.all([destinations, offers, points])
       tripPresenter.createPoint();
       newPointButton.disabled = true;
     });
+  }).catch(() => {
+    alert(INIT_ERROR_MESSAGE);
   });

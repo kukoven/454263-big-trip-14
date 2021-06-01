@@ -19,25 +19,26 @@ const getTimeDifference = (timeFrom, timeTo) => {
   return `${hours}H ${minutes}M`;
 };
 
-function getTimeDifferenceMs(start, end) {
+const getTimeDifferenceMs = (start, end) => {
   return dayjs(end).diff(dayjs(start));
-}
+};
 
-function getTimeFormatted(timeInMs) {
+const getTimeFormatted = (timeInMs) => {
   const time = {
+    days: dayjs.duration(timeInMs).asDays() > 1 ? dayjs.duration(timeInMs).days() + 'D ' : '',
     hours: dayjs.duration(timeInMs).hours() > 0 ? dayjs.duration(timeInMs).hours() + 'H ' : '',
     minutes: dayjs.duration(timeInMs).minutes() > 0 ? dayjs.duration(timeInMs).minutes() + 'M' : '',
   };
 
-  return time.hours + time.minutes;
-}
+  return time.days + time.hours + time.minutes;
+};
 
 const formatDateForEditPoint = (date) => {
   if (date !== null) {
     return dayjs(date).format('D/MM/YY HH:mm');
-  } else {
-    return '';
   }
+
+  return '';
 };
 
 const getTotalDate = (dateFrom, dateTo) => {
@@ -94,10 +95,6 @@ const sortPrice = (firstPoint, secondPoint) => {
   return 0;
 };
 
-const findOffersType = (offers, type) => {
-  return offers.find((currentValue) => currentValue.type.toLowerCase() === type.toLowerCase()).offers;
-};
-
 const isPointFuture = (date) => {
   return dayjs(date).isSameOrAfter(dayjs());
 };
@@ -115,7 +112,6 @@ export {
   sortDay,
   sortTime,
   sortPrice,
-  findOffersType,
   isPointFuture,
   isPointPast,
   getTimeFormatted,

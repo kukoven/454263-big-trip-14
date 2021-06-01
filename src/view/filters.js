@@ -53,6 +53,7 @@ class Filters extends AbstractView {
   }
 
   _filterTypeChangeHandler(evt) {
+    evt.preventDefault();
     this._callback.filterTypeChange(evt.target.value);
   }
 

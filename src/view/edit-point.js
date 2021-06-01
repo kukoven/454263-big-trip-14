@@ -6,7 +6,7 @@ import SmartView from './smart.js';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
-function createDestinationDatalistTemplate(destinations) {
+const createDestinationDatalistTemplate = (destinations) => {
   let optionsMarkup = '';
 
   destinations.forEach((currentValue) => {
@@ -14,9 +14,9 @@ function createDestinationDatalistTemplate(destinations) {
   });
 
   return optionsMarkup;
-}
+};
 
-function createOptionOffersTemplate(allOffersOfCurrentType, checkedOffers, isDisabled) {
+const createOptionOffersTemplate = (allOffersOfCurrentType, checkedOffers, isDisabled) => {
   const allOffers = allOffersOfCurrentType.offers;
 
   if (!allOffers.length) {
@@ -49,9 +49,9 @@ function createOptionOffersTemplate(allOffersOfCurrentType, checkedOffers, isDis
       ${optionsMarkup}
       </div>
     </section>`;
-}
+};
 
-function createEventTypeItemsTemplate(chosenType, types, isDisabled) {
+const createEventTypeItemsTemplate = (chosenType, types, isDisabled) => {
   let itemsMarkup = '';
 
   types.forEach((currentType) => {
@@ -62,15 +62,15 @@ function createEventTypeItemsTemplate(chosenType, types, isDisabled) {
   });
 
   return itemsMarkup;
-}
+};
 
-function createPicturesTemplate(pictures) {
+const createPicturesTemplate = (pictures) => {
   let picturesMarkup = '';
   pictures.forEach((picture) => {
     picturesMarkup += `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`;
   });
   return picturesMarkup;
-}
+};
 
 const createEditPointTemplate = (point, offersData, destinationsData, isDisabled) => {
   const {
@@ -136,7 +136,7 @@ const createEditPointTemplate = (point, offersData, destinationsData, isDisabled
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}" ${isDisabled ? 'disabled' : ''}>
+            <input class="event__input  event__input--price" id="event-price-1" type="number" min = "1" step = "1" name="event-price" value="${basePrice}" ${isDisabled ? 'disabled' : ''}>
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
@@ -190,6 +190,11 @@ class EditPoint extends SmartView {
     this._setToDatepicker();
   }
 
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._deletePointClickHandler);
+  }
+
   restoreHandlers() {
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
@@ -216,7 +221,7 @@ class EditPoint extends SmartView {
       this.getElement().querySelector('#event-start-time-1'),
       {
         enableTime: true,
-        time_24hr: true,
+        'time_24hr': true,
         dateFormat: 'd/m/y H:i',
         defaultDate: dayjs(this._data.dateFrom).toDate(),
         onChange: this._dateFromChangeHandler,
@@ -234,7 +239,7 @@ class EditPoint extends SmartView {
       this.getElement().querySelector('#event-end-time-1'),
       {
         enableTime: true,
-        time_24hr: true,
+        'time_24hr': true,
         minDate: dayjs(this._data.dateFrom).toDate(),
         dateFormat: 'd/m/y H:i',
         defaultDate: dayjs(this._data.dateTo).toDate(),
@@ -340,6 +345,14 @@ class EditPoint extends SmartView {
 
     const justDataUpdating = true;
 
+    evt.target.setCustomValidity('');
+
+    if (!evt.target.checkValidity()) {
+      evt.target.setCustomValidity('Set positive number');
+      evt.target.reportValidity();
+      return;
+    }
+
     this.updateData({
       basePrice: newPrice,
     }, justDataUpdating);
@@ -376,10 +389,16 @@ class EditPoint extends SmartView {
 
     if (newCityName === this._data.destination) {
       return;
-    } else if (this._getDestinationList(this._destinations).indexOf(newCityName) === -1) {
+    }
+
+    if (this._getDestinationList(this._destinations).indexOf(newCityName) === -1) {
+      evt.target.setCustomValidity('Choose city from the list');
+      evt.target.reportValidity();
       evt.currentTarget.value = '';
       return;
     }
+
+    evt.target.setCustomValidity('');
 
     const destinationItem = this._destinations.find((destination) => {
       return destination.name === newCityName;
@@ -395,11 +414,6 @@ class EditPoint extends SmartView {
   _deletePointClickHandler(evt) {
     evt.preventDefault();
     this._callback.deleteClick(EditPoint.parseDataToPoint(this._data));
-  }
-
-  setDeleteClickHandler(callback) {
-    this._callback.deleteClick = callback;
-    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._deletePointClickHandler);
   }
 
   static parsePointToData(point) {

@@ -132,7 +132,7 @@ const createNewPointTemplate = (point, offersData, destinationsData, isDisabled)
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}">
+            <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" min = "1" step = "1" value="${basePrice}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
@@ -193,6 +193,11 @@ class NewPoint extends SmartView {
     }
   }
 
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
+  }
+
   restoreHandlers() {
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
@@ -218,7 +223,7 @@ class NewPoint extends SmartView {
       this.getElement().querySelector('#event-start-time-1'),
       {
         enableTime: true,
-        time_24hr: true,
+        'time_24hr': true,
         dateFormat: 'd/m/y H:i',
         defaultDate: dayjs(this._data.dateFrom).toDate(),
         onChange: this._dateFromChangeHandler,
@@ -236,7 +241,7 @@ class NewPoint extends SmartView {
       this.getElement().querySelector('#event-end-time-1'),
       {
         enableTime: true,
-        time_24hr: true,
+        'time_24hr': true,
         minDate: dayjs(this._data.dateFrom).toDate(),
         dateFormat: 'd/m/y H:i',
         defaultDate: dayjs(this._data.dateTo).toDate(),
@@ -333,11 +338,6 @@ class NewPoint extends SmartView {
     this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
   }
 
-  setDeleteClickHandler(callback) {
-    this._callback.deleteClick = callback;
-    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
-  }
-
   getTemplate() {
     return createNewPointTemplate(this._data, this._offers, this._destinations);
   }
@@ -360,10 +360,16 @@ class NewPoint extends SmartView {
 
     if (newCityName === this._data.destination) {
       return;
-    } else if (this._getDestinationList(this._destinations).indexOf(newCityName) === -1) {
+    }
+
+    if (this._getDestinationList(this._destinations).indexOf(newCityName) === -1) {
+      evt.target.setCustomValidity('Choose city from the list');
+      evt.target.reportValidity();
       evt.currentTarget.value = '';
       return;
     }
+
+    evt.target.setCustomValidity('');
 
     const destinationItem = this._destinations.find((destination) => {
       return destination.name === newCityName;
@@ -380,6 +386,14 @@ class NewPoint extends SmartView {
     const newPrice = parseInt(evt.currentTarget.value);
 
     const justDataUpdating = true;
+
+    evt.target.setCustomValidity('');
+
+    if (!evt.target.checkValidity()) {
+      evt.target.setCustomValidity('Set positive number');
+      evt.target.reportValidity();
+      return;
+    }
 
     this.updateData({
       basePrice: newPrice,
@@ -416,7 +430,7 @@ class NewPoint extends SmartView {
       destination: destinations[0],
       dateFrom: dayjs().toDate(),
       dateTo: dayjs().toDate(),
-      basePrice: 0,
+      basePrice: 300,
       isFavorite: false,
       description: '',
       offers: [],
