@@ -1,5 +1,4 @@
 import NewPointView from '../view/new-point.js';
-import {nanoid} from 'nanoid';
 import {RenderPosition, render, remove} from '../util/render.js';
 import {UserAction, UpdateType} from '../const.js';
 
@@ -45,6 +44,25 @@ class NewPoint {
     document.removeEventListener('keydown', this._handleEscDown);
   }
 
+  setSaving() {
+    this._newPointComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._newPointComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this._newPointComponent.shake(resetFormState);
+  }
+
   _handleEscDown(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       this._checkPointsCountCallback();
@@ -58,11 +76,8 @@ class NewPoint {
     this._changeData(
       UserAction.ADD_POINT,
       UpdateType.MAJOR,
-      Object.assign({}, updatedPoint, {id: nanoid()}),
+      updatedPoint,
     );
-
-    this._newPointButton.disabled = false;
-    this.destroy();
   }
 
   _handleDeleteClick() {
