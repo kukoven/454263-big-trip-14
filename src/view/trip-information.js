@@ -7,15 +7,15 @@ const getTotalRoute = (points) => {
 
     return `${points[0].destination.name} - ... - ${points[points.length -1].destination.name}`;
 
-  } else {
-    const trips = [];
-
-    points.forEach((currentValue) => {
-      trips.push(currentValue.destination.name);
-    });
-
-    return trips.join('-');
   }
+
+  const trips = [];
+
+  points.forEach((currentValue) => {
+    trips.push(currentValue.destination.name);
+  });
+
+  return trips.join('-');
 };
 
 const createTripInformationTemplate = (points) => {

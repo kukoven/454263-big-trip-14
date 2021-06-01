@@ -1,6 +1,7 @@
 import NewPointView from '../view/new-point.js';
 import {RenderPosition, render, remove} from '../util/render.js';
 import {UserAction, UpdateType} from '../const.js';
+import {isEscEvent} from '../util/common.js';
 
 class NewPoint {
   constructor(pointListContainer, changeData, newPointButton) {
@@ -66,7 +67,7 @@ class NewPoint {
   }
 
   _handleEscDown(evt) {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
+    if (isEscEvent(evt)) {
       this._checkPointsCountCallback();
       this.destroy();
       document.removeEventListener('keydown', this._handleEscDown);

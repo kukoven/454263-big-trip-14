@@ -36,9 +36,9 @@ const getTimeFormatted = (timeInMs) => {
 const formatDateForEditPoint = (date) => {
   if (date !== null) {
     return dayjs(date).format('D/MM/YY HH:mm');
-  } else {
-    return '';
   }
+
+  return '';
 };
 
 const getTotalDate = (dateFrom, dateTo) => {

@@ -389,7 +389,9 @@ class EditPoint extends SmartView {
 
     if (newCityName === this._data.destination) {
       return;
-    } else if (this._getDestinationList(this._destinations).indexOf(newCityName) === -1) {
+    }
+
+    if (this._getDestinationList(this._destinations).indexOf(newCityName) === -1) {
       evt.target.setCustomValidity('Choose city from the list');
       evt.target.reportValidity();
       evt.currentTarget.value = '';
