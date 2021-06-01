@@ -54,6 +54,7 @@ class Trip {
 
   init() {
     this._renderTripEvents();
+    this._handleSortTypeChange(SortType.DAY);
 
     this._pointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
@@ -85,15 +86,6 @@ class Trip {
     }
 
     this._newPointPresenter.init(this._handlePointCreateFormClose, this._offers, this._destinations);
-  }
-
-  hideEventsTable() {
-    this._tripEventsElement.classList.add('trip-events--hidden');
-  }
-
-  showEventsTable() {
-    this._tripEventsElement.classList.remove('trip-events--hidden');
-    this._handleSortTypeChange(SortType.DAY);
   }
 
   _getPoints() {
@@ -132,7 +124,6 @@ class Trip {
         this._api.addPoint(update)
           .then((response) => {
             this._pointsModel.addPoint(updateType, response);
-            this._newPointButton.disabled = false;
           })
           .catch(() => {
             this._newPointPresenter.setAborting();
@@ -245,7 +236,6 @@ class Trip {
   }
 
   _clearEventPointsList({resetSortType = false} = {}) {
-    this._newPointPresenter.destroy();
     this._clearEventsTable();
 
     if (this._tripInformationPresenter.destroy) {
@@ -266,6 +256,8 @@ class Trip {
       });
 
     this._pointPresenter = {};
+
+    this._newPointPresenter.destroy();
 
     remove(this._sortComponent);
     remove(this._noPointComponent);

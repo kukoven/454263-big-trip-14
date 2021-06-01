@@ -34,6 +34,8 @@ class NewPoint {
   }
 
   destroy() {
+    this._newPointButton.disabled = false;
+
     if (this._newPointComponent === null) {
       return;
     }
@@ -68,7 +70,6 @@ class NewPoint {
       this._checkPointsCountCallback();
       this.destroy();
       document.removeEventListener('keydown', this._handleEscDown);
-      this._newPointButton.disabled = false;
     }
   }
 
@@ -82,7 +83,6 @@ class NewPoint {
 
   _handleDeleteClick() {
     this._checkPointsCountCallback();
-    this._newPointButton.disabled = false;
     this.destroy();
   }
 }

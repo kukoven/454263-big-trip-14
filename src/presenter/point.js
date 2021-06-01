@@ -141,8 +141,6 @@ class Point {
       UpdateType.MINOR,
       point,
     );
-
-    //this._replaceEditFormToPoint();
   }
 
   _handleFormClose() {

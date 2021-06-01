@@ -1,17 +1,21 @@
 import FiltersView from '../view/filters.js';
 import {render, RenderPosition, replace, remove} from '../util/render.js';
-import {UpdateType} from '../const.js';
+import {UpdateType, MenuItem} from '../const.js';
 
 
 class Filter {
-  constructor(filterContainer, filterModel) {
+  constructor(filterContainer, filterModel, handleSiteMenuClick) {
     this._filterContainer = filterContainer;
     this._filterModel = filterModel;
+
+    this._handleSiteMenuClick = handleSiteMenuClick;
 
     this._filterComponent = null;
 
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleFilterTypeChange = this._handleFilterTypeChange.bind(this);
+
+    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init() {
@@ -25,12 +29,14 @@ class Filter {
       return;
     }
 
+    this._handleSiteMenuClick(MenuItem.TABLE);
+
     replace(this._filterComponent, prevFilterComponent);
     remove(prevFilterComponent);
   }
 
   _handleModelEvent() {
-    this._init();
+    this.init();
   }
 
   _handleFilterTypeChange(filterType) {
