@@ -64,7 +64,7 @@ const getWeightNullDate = (firstDate, secondDate) => {
 const sortDay = (firstPoint, secondPoint) => {
   const weight = getWeightNullDate(firstPoint.dateFrom, secondPoint.dateFrom);
 
-  if (weight != null) {
+  if (weight !== null) {
     return weight;
   }
 
