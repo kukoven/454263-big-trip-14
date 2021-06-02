@@ -4,7 +4,6 @@ import {SortType, UserAction, UpdateType, FilterType} from '../const.js';
 import {render, RenderPosition, remove} from '../util/render.js';
 import PointPresenter, {State as PointPresenterViewState} from './point.js';
 import {sortDay, sortTime, sortPrice} from '../util/point.js';
-import FiltersView from '../view/filters.js';
 import NewPointPresenter from './new-point.js';
 import TripInformationPresenter from './trip-information.js';
 import {filter} from '../util/filter.js';
@@ -14,8 +13,6 @@ class Trip {
   constructor(tripMainElement, pageMainElement, pointsModel, filterModel, offers, destinations, api) {
 
     this._tripMainElement = tripMainElement;
-    this._siteMenuElement = this._tripMainElement.querySelector('.trip-controls__navigation');
-    this._filtersElement = this._tripMainElement.querySelector('.trip-controls__filters');
     this._newPointButton = tripMainElement.querySelector('.trip-main__event-add-btn');
 
     this._pageMainElement = pageMainElement;
@@ -29,7 +26,6 @@ class Trip {
     this._destinations = destinations;
 
     this._noPointComponent = null;
-    this._filtersComponent = new FiltersView();
     this._loadingComponent = new LoadingView();
     this._isLoading = true;
 
